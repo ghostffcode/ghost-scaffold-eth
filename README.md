@@ -1,8 +1,9 @@
-# 👻🏗 Ghost Scaffold-ETH
+# 👻🏗 Ghost Scaffold-ETH (WIP)
 
 > My personal starterkit for quick scaffold-eth Buidls
 
-![image](https://user-images.githubusercontent.com/2653167/124158108-c14ca380-da56-11eb-967e-69cde37ca8eb.png)
+![Ghost Scaffold-ETH](https://user-images.githubusercontent.com/14002941/160478916-77d99c6c-ce21-4781-a7ca-2327476a6f1f.png)
+
 
 # 🏄‍♂️ Quick Start
 
