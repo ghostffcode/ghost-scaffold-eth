@@ -13,7 +13,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link, Route, Switch, useLocation } from "react-router-dom";
 import "./App.css";
 import {
-  Account,
   Contract,
   Faucet,
   GasGauge,
@@ -23,14 +22,16 @@ import {
   NetworkDisplay,
   FaucetHint,
   NetworkSwitch,
+  MenuAccount,
 } from "./components";
 import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
-import { Home, ExampleUI, Hints, Subgraph } from "./views";
+import { Home } from "./views";
 import { useStaticJsonRPC } from "./hooks";
+import { useThemeSwitcher } from "react-css-theme-switcher";
 
 const { ethers } = require("ethers");
 /*
@@ -61,8 +62,6 @@ const NETWORKCHECK = true;
 const USE_BURNER_WALLET = true; // toggle burner wallet feature
 const USE_NETWORK_SELECTOR = false;
 
-const web3Modal = Web3ModalSetup();
-
 // 🛰 providers
 const providers = [
   "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
@@ -70,10 +69,23 @@ const providers = [
   "https://rpc.scaffoldeth.io:48544",
 ];
 
-function App(props) {
+const web3Modal = Web3ModalSetup();
+
+function App() {
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
   // reference './constants.js' for other networks
   const networkOptions = [initialNetwork.name, "mainnet", "rinkeby"];
+  const { currentTheme } = useThemeSwitcher();
+
+  // const updateWeb3Modal = async () => {
+  //   await web3Modal?.updateTheme(currentTheme);
+
+  //   console.log(currentTheme, web3Modal);
+  // };
+
+  // useEffect(() => {
+  //   updateWeb3Modal();
+  // }, [currentTheme]);
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
@@ -138,9 +150,6 @@ function App(props) {
   // 🏗 scaffold-eth is full of handy hooks like this one to get your balance:
   const yourLocalBalance = useBalance(localProvider, address);
 
-  // Just plug in different 🛰 providers to get your balance on different chains:
-  const yourMainnetBalance = useBalance(mainnetProvider, address);
-
   // const contractConfig = useContractConfig();
 
   const contractConfig = { deployedContracts: deployedContracts || {}, externalContracts: externalContracts || {} };
@@ -160,59 +169,6 @@ function App(props) {
   useOnBlock(mainnetProvider, () => {
     console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
   });
-
-  // Then read your DAI balance like:
-  const myMainnetDAIBalance = useContractReader(mainnetContracts, "DAI", "balanceOf", [
-    "0x34aA3F359A9D614239015126635CE7732c18fDF3",
-  ]);
-
-  // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
-
-  /*
-  const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
-  console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
-  */
-
-  //
-  // 🧫 DEBUG 👨🏻‍🔬
-  //
-  useEffect(() => {
-    if (
-      DEBUG &&
-      mainnetProvider &&
-      address &&
-      selectedChainId &&
-      yourLocalBalance &&
-      yourMainnetBalance &&
-      readContracts &&
-      writeContracts &&
-      mainnetContracts
-    ) {
-      console.log("_____________________________________ 🏗 scaffold-eth _____________________________________");
-      console.log("🌎 mainnetProvider", mainnetProvider);
-      console.log("🏠 localChainId", localChainId);
-      console.log("👩‍💼 selected address:", address);
-      console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId);
-      console.log("💵 yourLocalBalance", yourLocalBalance ? ethers.utils.formatEther(yourLocalBalance) : "...");
-      console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
-      console.log("📝 readContracts", readContracts);
-      console.log("🌍 DAI contract on mainnet:", mainnetContracts);
-      console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
-      console.log("🔐 writeContracts", writeContracts);
-    }
-  }, [
-    mainnetProvider,
-    address,
-    selectedChainId,
-    yourLocalBalance,
-    yourMainnetBalance,
-    readContracts,
-    writeContracts,
-    mainnetContracts,
-    localChainId,
-    myMainnetDAIBalance,
-  ]);
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
@@ -245,129 +201,28 @@ function App(props) {
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
   return (
-    <div className="App">
+    <div className="App mx-6">
       {/* ✏️ Edit the header and change the title to your project name */}
-      <Header />
-      <NetworkDisplay
-        NETWORKCHECK={NETWORKCHECK}
-        localChainId={localChainId}
-        selectedChainId={selectedChainId}
-        targetNetwork={targetNetwork}
-        logoutOfWeb3Modal={logoutOfWeb3Modal}
-        USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
-      />
-      <Menu style={{ textAlign: "center", marginTop: 40 }} selectedKeys={[location.pathname]} mode="horizontal">
-        <Menu.Item key="/">
-          <Link to="/">App Home</Link>
-        </Menu.Item>
-        <Menu.Item key="/debug">
-          <Link to="/debug">Debug Contracts</Link>
-        </Menu.Item>
-        <Menu.Item key="/hints">
-          <Link to="/hints">Hints</Link>
-        </Menu.Item>
-        <Menu.Item key="/exampleui">
-          <Link to="/exampleui">ExampleUI</Link>
-        </Menu.Item>
-        <Menu.Item key="/mainnetdai">
-          <Link to="/mainnetdai">Mainnet DAI</Link>
-        </Menu.Item>
-        <Menu.Item key="/subgraph">
-          <Link to="/subgraph">Subgraph</Link>
-        </Menu.Item>
-      </Menu>
+      <div className="flex flex-1 justify-between items-center pt-4">
+        <div className="flex flex-1">
+          <Header />
+        </div>
 
-      <Switch>
-        <Route exact path="/">
-          {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
-          <Home yourLocalBalance={yourLocalBalance} readContracts={readContracts} />
-        </Route>
-        <Route exact path="/debug">
-          {/*
-                🎛 this scaffolding is full of commonly used components
-                this <Contract/> component will automatically parse your ABI
-                and give you a form to interact with it locally
-            */}
+        <div className="flex flex-1 justify-center">
+          <Menu selectedKeys={[location.pathname]} mode="horizontal">
+            <Menu.Item key="/">
+              <Link to="/">App Home</Link>
+            </Menu.Item>
+            {DEBUG && (
+              <Menu.Item key="/debug">
+                <Link to="/debug">Contracts</Link>
+              </Menu.Item>
+            )}
+          </Menu>
+        </div>
 
-          <Contract
-            name="YourContract"
-            price={price}
-            signer={userSigner}
-            provider={localProvider}
-            address={address}
-            blockExplorer={blockExplorer}
-            contractConfig={contractConfig}
-          />
-        </Route>
-        <Route path="/hints">
-          <Hints
-            address={address}
-            yourLocalBalance={yourLocalBalance}
-            mainnetProvider={mainnetProvider}
-            price={price}
-          />
-        </Route>
-        <Route path="/exampleui">
-          <ExampleUI
-            address={address}
-            userSigner={userSigner}
-            mainnetProvider={mainnetProvider}
-            localProvider={localProvider}
-            yourLocalBalance={yourLocalBalance}
-            price={price}
-            tx={tx}
-            writeContracts={writeContracts}
-            readContracts={readContracts}
-            purpose={purpose}
-          />
-        </Route>
-        <Route path="/mainnetdai">
-          <Contract
-            name="DAI"
-            customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.DAI}
-            signer={userSigner}
-            provider={mainnetProvider}
-            address={address}
-            blockExplorer="https://etherscan.io/"
-            contractConfig={contractConfig}
-            chainId={1}
-          />
-          {/*
-            <Contract
-              name="UNI"
-              customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.UNI}
-              signer={userSigner}
-              provider={mainnetProvider}
-              address={address}
-              blockExplorer="https://etherscan.io/"
-            />
-            */}
-        </Route>
-        <Route path="/subgraph">
-          <Subgraph
-            subgraphUri={props.subgraphUri}
-            tx={tx}
-            writeContracts={writeContracts}
-            mainnetProvider={mainnetProvider}
-          />
-        </Route>
-      </Switch>
-
-      <ThemeSwitch />
-
-      {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
-      <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
-        <div style={{ display: "flex", flex: 1, alignItems: "center" }}>
-          {USE_NETWORK_SELECTOR && (
-            <div style={{ marginRight: 20 }}>
-              <NetworkSwitch
-                networkOptions={networkOptions}
-                selectedNetwork={selectedNetwork}
-                setSelectedNetwork={setSelectedNetwork}
-              />
-            </div>
-          )}
-          <Account
+        <div className="flex flex-1 justify-end">
+          <MenuAccount
             useBurner={USE_BURNER_WALLET}
             address={address}
             localProvider={localProvider}
@@ -380,7 +235,63 @@ function App(props) {
             blockExplorer={blockExplorer}
           />
         </div>
-        {yourLocalBalance.lte(ethers.BigNumber.from("0")) && (
+      </div>
+      <NetworkDisplay
+        NETWORKCHECK={NETWORKCHECK}
+        localChainId={localChainId}
+        selectedChainId={selectedChainId}
+        targetNetwork={targetNetwork}
+        logoutOfWeb3Modal={logoutOfWeb3Modal}
+        USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
+      />
+
+      <section className="mt-4 flex flex-1">
+        <Switch>
+          <Route exact path="/">
+            {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
+            <Home
+              tx={tx}
+              readContracts={readContracts}
+              writeContracts={writeContracts}
+              yourLocalBalance={yourLocalBalance}
+            />
+          </Route>
+          <Route exact path="/debug">
+            {/*
+                🎛 this scaffolding is full of commonly used components
+                this <Contract/> component will automatically parse your ABI
+                and give you a form to interact with it locally
+            */}
+
+            <Contract
+              name="YourContract"
+              price={price}
+              signer={userSigner}
+              provider={localProvider}
+              address={address}
+              blockExplorer={blockExplorer}
+              contractConfig={contractConfig}
+            />
+          </Route>
+        </Switch>
+      </section>
+
+      <ThemeSwitch />
+
+      {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
+      <div style={{ position: "fixed", textAlign: "right", right: 0, top: 50, padding: 10 }}>
+        <div style={{ display: "flex", flex: 1, alignItems: "center" }}>
+          {USE_NETWORK_SELECTOR && (
+            <div style={{ marginRight: 20 }}>
+              <NetworkSwitch
+                networkOptions={networkOptions}
+                selectedNetwork={selectedNetwork}
+                setSelectedNetwork={setSelectedNetwork}
+              />
+            </div>
+          )}
+        </div>
+        {address && yourLocalBalance.lte(ethers.BigNumber.from("0")) && (
           <FaucetHint localProvider={localProvider} targetNetwork={targetNetwork} address={address} />
         )}
       </div>

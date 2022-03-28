@@ -17,7 +17,7 @@ function NetworkDisplay({
     const networkLocal = NETWORK(localChainId);
     if (selectedChainId === 1337 && localChainId === 31337) {
       networkDisplay = (
-        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 60, padding: 16 }}>
+        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 90, padding: 16 }}>
           <Alert
             message="⚠️ Wrong Network ID"
             description={
@@ -34,7 +34,7 @@ function NetworkDisplay({
       );
     } else {
       networkDisplay = (
-        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 60, padding: 16 }}>
+        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 90, padding: 16 }}>
           <Alert
             message="⚠️ Wrong Network"
             description={
@@ -90,7 +90,7 @@ function NetworkDisplay({
     }
   } else {
     networkDisplay = USE_NETWORK_SELECTOR ? null : (
-      <div style={{ zIndex: -1, position: "absolute", right: 154, top: 28, padding: 16, color: targetNetwork.color }}>
+      <div style={{ zIndex: -1, position: "absolute", right: 20, top: 60, padding: 16, color: targetNetwork.color }}>
         {targetNetwork.name}
       </div>
     );

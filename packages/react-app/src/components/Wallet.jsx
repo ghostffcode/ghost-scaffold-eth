@@ -1,9 +1,8 @@
-import { Button, Modal, Spin, Tooltip, Typography } from "antd";
-import React, { useState, useEffect } from "react";
-import { ethers } from "ethers";
 import { KeyOutlined, QrcodeOutlined, SendOutlined, WalletOutlined } from "@ant-design/icons";
+import { Button, Modal, Spin, Tooltip, Typography } from "antd";
+import { ethers } from "ethers";
 import QR from "qrcode.react";
-
+import React, { useState, useEffect } from "react";
 import { Transactor } from "../helpers";
 import Address from "./Address";
 import AddressInput from "./AddressInput";
@@ -12,7 +11,7 @@ import EtherInput from "./EtherInput";
 
 const { Text, Paragraph } = Typography;
 
-/**
+/*
   ~ What it does? ~
 
   Displays a wallet where you can specify address and send USD/ETH, with options to
@@ -38,7 +37,7 @@ const { Text, Paragraph } = Typography;
               (ex. "0xa870" => "user.eth") or you can enter directly ENS name instead of address
   - Provide price={price} of ether and easily convert between USD and ETH
   - Provide color to specify the color of wallet icon
-**/
+*/
 
 export default function Wallet(props) {
   const [signerAddress, setSignerAddress] = useState();
@@ -60,25 +59,29 @@ export default function Wallet(props) {
   const [toAddress, setToAddress] = useState();
   const [pk, setPK] = useState();
 
-  const providerSend = props.provider ? (
-    <Tooltip title="Wallet">
-      <WalletOutlined
-        onClick={() => {
-          setOpen(!open);
-        }}
-        rotate={-90}
-        style={{
-          padding: 7,
-          color: props.color ? props.color : "",
-          cursor: "pointer",
-          fontSize: 28,
-          verticalAlign: "middle",
-        }}
-      />
-    </Tooltip>
-  ) : (
-    ""
-  );
+  useEffect(() => {
+    setOpen(props.open);
+  }, [props.open]);
+
+  const providerSend = props.provider
+    ? !props.hideButton && (
+        <Tooltip title="Wallet">
+          <WalletOutlined
+            onClick={() => {
+              setOpen(!open);
+            }}
+            rotate={-90}
+            style={{
+              padding: 7,
+              color: props.color ? props.color : "",
+              cursor: "pointer",
+              fontSize: 28,
+              verticalAlign: "middle",
+            }}
+          />
+        </Tooltip>
+      )
+    : "";
 
   let display;
   let receiveButton;
@@ -311,6 +314,7 @@ export default function Wallet(props) {
           setQr();
           setPK();
           setOpen(!open);
+          props.closed && props.closed();
         }}
         footer={[
           privateKeyButton,

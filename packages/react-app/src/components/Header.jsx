@@ -3,21 +3,14 @@ import React from "react";
 
 // displays a page header
 
-export default function Header({link, title, subTitle}) {
+export default function Header() {
   return (
-    <a href={link} target="_blank" rel="noopener noreferrer">
+    <a href="/" rel="noopener noreferrer">
       <PageHeader
-        title={title}
-        subTitle={subTitle}
-        style={{ cursor: "pointer" }}
+        title="⚡️ Ghost Scaffold-ETH"
+        subTitle="A starterkit for @ghostffcode buidls"
+        className="inline-flex"
       />
     </a>
   );
-}
-
-
-Header.defaultProps = {
-  link: "https://github.com/austintgriffith/scaffold-eth",
-  title: "🏗 scaffold-eth",
-  subTitle: "forkable Ethereum dev stack focused on fast product iteration",
 }

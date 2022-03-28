@@ -45,7 +45,12 @@ export default function Balance(props) {
     floatBalance = parseFloat(etherBalance);
   }
 
-  let displayBalance = floatBalance.toFixed(4);
+  let displayBalance = [
+    <span key="number">{floatBalance.toFixed(2)}</span>,
+    <span key="currency" className="ml-1">
+      Ξ
+    </span>,
+  ];
 
   const price = props.price || props.dollarMultiplier || 1;
 

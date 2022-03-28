@@ -1,4 +1,22 @@
-.App {
-  text-align: center;
-  padding-left: calc(100vw - 100%);
+.ant-page-header {
+  @apply p-0 !important;
+}
+
+.balance-wrapper {
+  margin: 0.1rem;
+  padding: 0.02rem;
+}
+
+.ant-page-header-heading-left {
+  align-items: flex-start !important;
+  flex-direction: column;
+}
+
+.ant-typography-copy {
+  @apply inline-flex !important;
+  margin-top: -1.5rem;
+}
+
+.web3modal-modal-lightbox {
+  z-index: 2000 !important;
 }
