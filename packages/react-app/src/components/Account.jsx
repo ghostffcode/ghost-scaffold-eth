@@ -157,7 +157,7 @@ export default function Account({
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center mr-5 no-underline"
-              href={`${blockExplorer || "https://etherscan.io/"}address/${address}}`}
+              href={`${blockExplorer || "https://etherscan.io/"}address/${address}`}
             >
               <ExternalLink size={14} /> <span className="ml-2 text-sm">View in explorer</span>
             </a>
